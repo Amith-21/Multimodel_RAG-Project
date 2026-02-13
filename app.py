@@ -250,6 +250,6 @@ if prompt := st.chat_input("Execute Query..."):
             st.write("Applying cross-attention to visual stream...")
             time.sleep(1)
         
-        response = "ACCESS GRANTED. The analyzed documentation indicates a 94% match for your query parameters."
+    response = "ACCESS GRANTED. The analyzed documentation indicates a 94% match for your query parameters."
         st.write(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
