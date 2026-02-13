@@ -1,71 +1,44 @@
-# Enterprise Multimodal RAG (Text + Vision)
+# 🧠 Brocode AI: Enterprise Multimodal RAG
+### **The Intelligence Orchestration Layer for Unstructured Data**
 
-This project is an end-to-end **Multimodal Retrieval-Augmented Generation (RAG)** system that enables question answering over both:
-
-- Text documents (TXT, PDF)
-- Images (diagrams, charts, screenshots)
-
-It combines:
-
-- Document retrieval using embeddings + FAISS
-- Image understanding using Groq Vision models
-- Grounded answer generation using Groq LLMs
-- A modern Streamlit user interface
+Brocode AI is a high-performance **Retrieval-Augmented Generation (RAG)** system engineered to bridge the gap between static text and visual intelligence. By unifying vector search with vision-language models, it turns PDFs, technical manuals, and complex diagrams into a searchable, interactive knowledge base.
 
 ---
 
-## Live Demo
+## ⚡ Core Capabilities
 
-The application is deployed and accessible here:
-
-https://rag-with-multimodality.streamlit.app/
-
----
-
-## Key Features
-
-- Text-based RAG over uploaded TXT and PDF files  
-- Multimodal RAG support with image understanding  
-- Vision-based image captioning using:
-
-  `meta-llama/llama-4-scout-17b-16e-instruct`
-
-- Embedding generation using Jina Embeddings v4 API  
-- Vector similarity retrieval with FAISS  
-- Simple reranking layer for improved relevance  
-- Guardrails to reduce hallucinations (context-only answering)  
-- Session memory with recent chat history  
-- Latency tracking displayed in the UI  
-- Metadata filtering (retrieve text-only, image-only, or both)
+| Feature | Technical Implementation |
+| :--- | :--- |
+| **Neural Search** | High-density vector retrieval powered by **Jina Embeddings v4**. |
+| **Visual Stream** | **Llama 4 Scout** vision models translate images into semantic context. |
+| **Vector Engine** | **FAISS** index for microsecond-latency similarity matching. |
+| **Synthesis** | **Groq-accelerated LLMs** for hyper-fast, grounded reasoning. |
+| **Refinement** | Multi-stage reranking to eliminate noise and improve precision. |
 
 ---
 
-## Architecture Overview
+## 🏗️ Neural Pipeline Architecture
 
-1. User uploads a document (TXT/PDF)
-2. Text is chunked with overlap for better retrieval
-3. User optionally uploads an image
-4. Image is converted into semantic text using Groq Vision
-5. All chunks are embedded using Jina Embeddings v4
-6. FAISS retrieves the most relevant context
-7. Retrieved chunks are reranked
-8. Groq LLM generates an answer grounded in retrieved context
+
+
+The system operates through a structured **8-stage pipeline** to ensure data integrity and minimize hallucinations:
+
+1.  **Ingestion:** Parallel loading of TXT/PDF and visual assets.
+2.  **Decomposition:** Text is chunked with optimized overlap for context retention.
+3.  **Vision Analysis:** Images are decoded into detailed descriptive metadata.
+4.  **Vectorization:** Every node is mapped into a high-dimensional latent space.
+5.  **Similarity Search:** FAISS retrieves the Top-K relevant data nodes.
+6.  **Heuristic Reranking:** Context is filtered for maximum semantic relevance.
+7.  **Grounded Synthesis:** LLM generates answers *only* from retrieved telemetry.
+8.  **Telemetry Tracking:** Real-time monitoring of latency and token economics.
 
 ---
 
-## Project Structure
+## 🚀 Deployment & Access
 
-```bash
-multimodal-rag-jina4/
-├── app.py
-├── requirements.txt
-├── config.py
-├── README.md
-└── rag/
-    ├── __init__.py
-    ├── embeddings.py
-    ├── retriever.py
-    ├── chunking.py
-    ├── vision.py
-    ├── reranker.py
-    └── llm.py
+**Experience the Command Center live:** 👉 [**Launch Brocode AI Interface**](https://rag-with-multimodality.streamlit.app/)
+
+> **🔒 Security Note:** This system implements strict context-guardrails. If the uploaded intelligence does not contain the answer, the engine will prioritize accuracy over hallucination.
+
+---
+© 2026 Brocode AI // Built for the Enterprise.
