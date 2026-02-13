@@ -1,0 +1,8 @@
+streamlit
+faiss-cpu
+numpy
+groq
+easyocr
+pillow
+requests
+pypdf
