@@ -34,7 +34,7 @@ The system operates through a structured **8-stage pipeline** to ensure data int
 
 ## 🚀 Deployment & Access
 
-**Experience Brocode AI live:** 👉 [**Launch Interface**](https://rag-with-multimodality.streamlit.app/)
+**Experience Brocode AI live:** 👉 [**Launch Interface**](https://multimodelrag-project-fmtappgpwwknrb235mfjhfk.streamlit.app/)
 
 > **🔒 Security Note:** Brocode AI implements strict context-guardrails. If the uploaded intelligence does not contain the answer, the engine will prioritize accuracy over hallucination.
 
