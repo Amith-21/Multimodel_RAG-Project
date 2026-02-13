@@ -1,4 +1,6 @@
 streamlit
+pandas
+plotly
 faiss-cpu
 numpy
 groq
