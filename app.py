@@ -1,12 +1,9 @@
 import streamlit as st
 import time
 import pandas as pd
-import numpy as np
-import plotly.express as px
 from pypdf import PdfReader
 
-# --- IMPORT YOUR RAG CORE ---
-# Ensure these files exist in your 'rag/' folder
+# --- CORE RAG IMPORTS ---
 from rag.embeddings import get_jina_embeddings
 from rag.vision import describe_image
 from rag.chunking import chunk_text
@@ -21,107 +18,96 @@ st.set_page_config(page_title="Brocode AI | Command Center", page_icon="💀", l
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-    .stApp { background-color: #050505; color: #f0fdfa; font-family: 'JetBrains Mono', monospace; }
-    .main-title {
-        font-size: 72px; font-weight: 800;
-        background: linear-gradient(to right, #ffffff, #22d3ee, #34d399);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.4));
-    }
-    .status-box { background: rgba(34, 211, 238, 0.05); border: 1px solid #22d3ee; padding: 10px; border-radius: 5px; color: #22d3ee; font-size: 0.8rem; }
+    .stApp { background-color: #050505; color: #22d3ee; font-family: 'JetBrains Mono', monospace; }
+    .main-title { font-size: 64px; font-weight: 800; background: linear-gradient(90deg, #fff, #22d3ee, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.3)); }
+    .css-1n76uvr { background: rgba(34, 211, 238, 0.05); border: 1px solid #22d3ee; border-radius: 10px; }
+    .token-meter { font-size: 0.7rem; color: #34d399; text-align: right; margin-top: -10px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR: CONFIG & API KEYS ---
+# --- SIDEBAR: SYSTEM METRICS ---
 with st.sidebar:
-    st.markdown("### `SYSTEM_AUTH`")
+    st.markdown("### `SYSTEM_TELEMETRY`")
     groq_key = st.text_input("GROQ_API_KEY", type="password")
     jina_key = st.text_input("JINA_API_KEY", type="password")
     
     st.divider()
-    st.markdown("### `SYSTEM_TELEMETRY`")
-    st.progress(65, text="Neural Load")
+    if "chunks" in st.session_state:
+        st.markdown(f"**MEMORY_LOAD:** `{len(st.session_state.chunks)} Chunks`")
+        with st.expander("🔎 DOCUMENT_X-RAY"):
+            for i, c in enumerate(st.session_state.chunks[:5]):
+                st.caption(f"CHUNK_{i}: {c[:50]}...")
     
-    if st.button("💀 PURGE_SESSION", use_container_width=True):
+    if st.button("💀 PURGE_MEMORY", use_container_width=True):
         st.session_state.clear()
         st.rerun()
 
 # --- HEADER ---
 st.markdown("<h1 class='main-title'>BROCODE AI</h1>", unsafe_allow_html=True)
-st.markdown("`DIR: /root/multimodal_rag/prod_v3`")
 
 # --- DATA INGESTION ---
-c1, c2 = st.columns(2)
-with c1:
-    st.markdown("### `DOC_MOUNT`")
-    txt_file = st.file_uploader("Internal Docs", type=['pdf', 'txt'], label_visibility="collapsed")
-with c2:
-    st.markdown("### `VIS_MOUNT`")
-    img_file = st.file_uploader("Vision Assets", type=['png', 'jpg'], label_visibility="collapsed")
+col1, col2 = st.columns(2)
+with col1:
+    txt_file = st.file_uploader("📂 MOUNT_TEXT_ASSETS", type=['pdf', 'txt'])
+with col2:
+    img_file = st.file_uploader("👁️ SYNC_VISION_STREAM", type=['png', 'jpg'])
 
-# --- RAG INITIALIZATION ---
+# --- NEURAL ENGINE WARMUP ---
 if txt_file and groq_key and jina_key:
     if "retriever" not in st.session_state:
-        with st.status("`INITIALIZING_NEURAL_LAYERS...`"):
-            # 1. Text Extraction
-            if txt_file.name.endswith(".pdf"):
-                reader = PdfReader(txt_file)
-                raw_text = "\n".join([p.extract_text() for p in reader.pages if p.extract_text()])
-            else:
-                raw_text = txt_file.read().decode("utf-8")
-
-            # 2. Chunking
-            chunks = chunk_text(raw_text)
-            metadata = [{"type": "text"} for _ in chunks]
-
-            # 3. Vision Integration
+        with st.status("`WARMING_NEURAL_LAYERS...`"):
+            # Extraction
+            text = "\n".join([p.extract_text() for p in PdfReader(txt_file).pages]) if txt_file.name.endswith(".pdf") else txt_file.read().decode()
+            chunks = chunk_text(text)
+            
+            # Vision Logic
             if img_file:
-                st.write("Processing Vision Stream...")
-                vision_text = describe_image(img_file.read(), groq_key)
-                chunks.append(f"IMAGE_ANALYSIS: {vision_text}")
-                metadata.append({"type": "image"})
-
-            # 4. Vectorization
-            st.write("Generating Jina Embeddings...")
-            embs = get_jina_embeddings(chunks, jina_key)
-            st.session_state.retriever = FAISSRetriever(embs, metadata)
+                st.write("Cross-referencing vision stream...")
+                v_desc = describe_image(img_file.read(), groq_key)
+                chunks.append(f"VISION_INPUT_ANALYSIS: {v_desc}")
+            
+            # Embedding
+            st.write("Mapping latent space...")
+            embeddings = get_jina_embeddings(chunks, jina_key)
+            st.session_state.retriever = FAISSRetriever(embeddings, [{"id": i} for i in range(len(chunks))])
             st.session_state.chunks = chunks
-            st.success("KNOWLEDGE_BASE_MOUNTED")
+            st.session_state.init = True
 
-    # --- CHAT INTERFACE ---
-    st.divider()
+    # --- INTELLIGENCE INTERFACE ---
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    # Display History
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+            st.markdown(msg["content"])
 
-    if prompt := st.chat_input("Execute Intelligence Query..."):
+    # Interaction Logic
+    if prompt := st.chat_input("Execute Intelligence Request..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
-            st.write(prompt)
-            
+            st.markdown(prompt)
+
         with st.chat_message("assistant"):
-            with st.status("`RAG_ORCHESTRATION...`"):
-                # Search
+            # 1. CHAIN OF THOUGHT (The Ghosting Feature)
+            with st.status("`GHOST_REASONING_IN_PROGRESS...`"):
+                st.write("Searching vector database...")
                 q_emb = get_jina_embeddings([prompt], jina_key)
-                ids = st.session_state.retriever.search(q_emb, top_k=5)
-                retrieved = [st.session_state.chunks[i] for i in ids]
+                ids = st.session_state.retriever.search(q_emb, top_k=3)
+                relevant = [st.session_state.chunks[i] for i in ids]
                 
-                # Rerank & Final Answer
-                context_docs = simple_rerank(prompt, retrieved)
-                context = "\n\n".join(context_docs[:3])
+                st.write("Analyzing contextual relevance...")
+                context = "\n\n".join(relevant)
                 
-                # CALL THE LLM FOR THE REAL ANSWER
-                answer = ask_llm(context, prompt, groq_key, "llama-3.1-8b-instant")
+                st.write("Synthesizing final intelligence...")
+                final_answer = ask_llm(context, prompt, groq_key, "llama-3.1-8b-instant")
             
-            st.write(answer)
-            st.session_state.messages.append({"role": "assistant", "content": answer})
+            # 2. OUTPUT DISPLAY
+            st.markdown(final_answer)
+            st.session_state.messages.append({"role": "assistant", "content": final_answer})
             
-            # Feature: Show Sources in a Code Block
-            with st.expander("`VIEW_SOURCE_CHUNKS`"):
-                st.code(context, language="markdown")
+            # 3. TOKEN METER
+            st.markdown(f"<div class='token-meter'>EST_TOKENS: {len(final_answer)//4 + len(context)//4} // STATUS: OPTIMAL</div>", unsafe_allow_html=True)
 
 else:
-    st.info("⚡ READY_STATE_WAITING: Please provide API keys and upload source files.")
+    st.warning("⚠️ SYSTEM_OFFLINE: Mount knowledge assets and provide API credentials.")
