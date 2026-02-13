@@ -1,7 +1,7 @@
-# 🧠 Brocode AI: Enterprise Multimodal RAG
+# 🧠 BROCODE AI
 ### **The Intelligence Orchestration Layer for Unstructured Data**
 
-Brocode AI is a high-performance **Retrieval-Augmented Generation (RAG)** system engineered to bridge the gap between static text and visual intelligence. By unifying vector search with vision-language models, it turns PDFs, technical manuals, and complex diagrams into a searchable, interactive knowledge base.
+Brocode AI is a high-performance **Multimodal Retrieval-Augmented Generation (RAG)** system engineered to bridge the gap between static text and visual intelligence. By unifying vector search with vision-language models, it turns PDFs, technical manuals, and complex diagrams into a searchable, interactive knowledge base.
 
 ---
 
@@ -17,9 +17,7 @@ Brocode AI is a high-performance **Retrieval-Augmented Generation (RAG)** system
 
 ---
 
-## 🏗️ Neural Pipeline Architecture
-
-
+## 🏗️ Brocode AI Pipeline Architecture
 
 The system operates through a structured **8-stage pipeline** to ensure data integrity and minimize hallucinations:
 
@@ -36,9 +34,9 @@ The system operates through a structured **8-stage pipeline** to ensure data int
 
 ## 🚀 Deployment & Access
 
-**Experience the Command Center live:** 👉 [**Launch Brocode AI Interface**](https://rag-with-multimodality.streamlit.app/)
+**Experience Brocode AI live:** 👉 [**Launch Interface**](https://rag-with-multimodality.streamlit.app/)
 
-> **🔒 Security Note:** This system implements strict context-guardrails. If the uploaded intelligence does not contain the answer, the engine will prioritize accuracy over hallucination.
+> **🔒 Security Note:** Brocode AI implements strict context-guardrails. If the uploaded intelligence does not contain the answer, the engine will prioritize accuracy over hallucination.
 
 ---
-© 2026 Brocode AI // Built for the Enterprise.
+© 2026 Brocode AI // Engineered for Performance.
